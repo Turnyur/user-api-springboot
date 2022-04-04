@@ -65,12 +65,12 @@ public class UserController {
     public ResponseEntity deleteUser(@RequestHeader String authorization, @PathVariable String id) {
         validateToken(authorization);
         userService.deleteUser(id);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
 
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<User> updateUserDetails(@RequestHeader String authorization, @RequestBody User user, @PathVariable String id ) {
+    public ResponseEntity<User> updateUserDetails(@RequestHeader String authorization, @Valid @RequestBody User user, @PathVariable String id ) {
         validateToken(authorization);
 
         User res =userService.updateUserDetail(user, id);

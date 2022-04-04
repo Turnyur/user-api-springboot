@@ -22,9 +22,13 @@ public class User {
     private long Id;
     @Size(min = 3, max = 128)
     @NotBlank(message = "Please provide Firstname field")
+    @NotEmpty
+    @NotNull
     private String FirstName;
 
     @Size( max = 128)
+    @NotEmpty
+    @NotEmpty
     private String LastName;
 
     @JsonFormat(pattern="yyyy-MM-dd")

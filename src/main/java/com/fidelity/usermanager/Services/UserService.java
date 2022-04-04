@@ -28,7 +28,7 @@ public class UserService implements  IUserService{
         System.out.println("Day Of BIRTH:"+ user.getBirthDate());
         long dayDiff =getDateDiffDays(user.getBirthDate());
         System.out.println("Day DIFF:"+ dayDiff);
-        if (dayDiff<AppConst.MAX_AGE){
+        if (dayDiff<AppConst.MIN_AGE){
             throw new UserException( "BirthDate", "You must be 18 years and above");
         }
         User res=userRepository.save(user);
@@ -63,25 +63,25 @@ public class UserService implements  IUserService{
     @Override
     public User updateUserDetail(User user, String userId) {
 
+        System.out.println("Day Of BIRTH:"+ user.getBirthDate());
         long dayDiff =getDateDiffDays(user.getBirthDate());
         System.out.println("Day DIFF:"+ dayDiff);
-        if (dayDiff<AppConst.MAX_AGE){
+        if (dayDiff<AppConst.MIN_AGE){
             throw new UserException( "BirthDate", "You must be 18 years and above");
-
         }
-        User exUsr = userRepository.getById(Long.parseLong(userId));
+        Optional<User> exUsr = userRepository.findById(Long.parseLong(userId));
 
         if(exUsr==null){
             throw new ResourceNotFound("User", "Id", "Unable to find this record");
         }
-        exUsr.setFirstName(user.getFirstName());
-        exUsr.setLastName(user.getLastName());
-        exUsr.setBirthDate(user.getBirthDate());
-        exUsr.setEmail(user.getEmail());
+        exUsr.get().setFirstName(user.getFirstName());
+        exUsr.get().setLastName(user.getLastName());
+        exUsr.get().setBirthDate(user.getBirthDate());
+        exUsr.get().setEmail(user.getEmail());
 
-        userRepository.save(exUsr);
+        userRepository.save(exUsr.get());
 
-        return exUsr;
+        return exUsr.get();
     }
 
     @Override
