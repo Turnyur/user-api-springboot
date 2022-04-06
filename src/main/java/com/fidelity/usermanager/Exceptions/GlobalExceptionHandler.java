@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleResourceNotFoundError(ResourceNotFound ex, WebRequest req){
 
         APIResponseDTO responseObject = new APIResponseDTO();
-        responseObject.message ="Resource Not Found";
+        responseObject.message ="Resource not found";
         responseObject.timestamp = new Date();
         responseObject.status = "error";
         responseObject.code = HttpStatus.NOT_FOUND.value();
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBirthDateException(BirthDateException ex, WebRequest req){
 
         APIResponseDTO responseObject = new APIResponseDTO();
-        responseObject.message ="Invalid Birthdate";
+        responseObject.message ="Invalid birth date";
         responseObject.timestamp = new Date();
         responseObject.status = "error";
         responseObject.code = HttpStatus.BAD_REQUEST.value();
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleEmailDuplicateException(EmailDuplicateException ex, WebRequest req){
 
         APIResponseDTO responseObject = new APIResponseDTO();
-        responseObject.message ="Invalid Birthdate";
+        responseObject.message ="Duplicate email";
         responseObject.timestamp = new Date();
         responseObject.status = "error";
         responseObject.code = HttpStatus.BAD_REQUEST.value();
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleAuthorizationException(AuthorizationException ex, WebRequest req){
 
         APIResponseDTO responseObject = new APIResponseDTO();
-        responseObject.message ="Invalid Token";
+        responseObject.message ="Invalid token";
         responseObject.timestamp = new Date();
         responseObject.status = "error";
         responseObject.code = HttpStatus.BAD_REQUEST.value();

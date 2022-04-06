@@ -29,7 +29,7 @@ public class UserService implements  IUserService{
         long dayDiff =getDateDiffDays(user.getBirthDate());
         System.out.println("Day DIFF:"+ dayDiff);
         if (dayDiff<AppConst.MIN_AGE){
-            throw new UserException( "BirthDate", "You must be 18 years and above");
+            throw new BirthDateException("api/users", "BirthDate", "You must be 18 years and above");
         }
         User res=userRepository.save(user);
         if(res==null){
