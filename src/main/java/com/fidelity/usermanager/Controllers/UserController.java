@@ -1,6 +1,8 @@
 package com.fidelity.usermanager.Controllers;
 
 import com.fidelity.usermanager.Const.AppConst;
+import com.fidelity.usermanager.DTOs.APIResponseDTO;
+import com.fidelity.usermanager.Exceptions.EmailDuplicateException;
 import com.fidelity.usermanager.Exceptions.ResourceNotFound;
 import com.fidelity.usermanager.Exceptions.UserException;
 import com.fidelity.usermanager.Models.User;
@@ -15,50 +17,48 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("api/users")
 
-public class UserController {
+public class UserController extends BaseController {
     Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private IUserService userService;
     @Autowired
     public UserController(IUserService userService) {
-
+        super(userService);
         this.userService = userService;
     }
 
-    public boolean isUserDuplicate(String email){
-       List<User> users =  userService.findByEmail(email);
-        if(users.size()>1){
-            return true;
-        }
-        return false;
-    }
+
     @GetMapping
-    public ResponseEntity<Iterable<User>> getUsers(@RequestHeader String authorization){
-
+    public ResponseEntity<APIResponseDTO> getUsers(@RequestHeader String authorization){
        validateToken(authorization);
-        return new ResponseEntity<Iterable<User>>(userService.getAllUsers(),HttpStatus.OK);
+        APIResponseDTO response =userService.makeAPIResponse();
+        response.code=HttpStatus.OK.value();
+        response.path="api/users";
+        List<?> users= userService.getAllUsers();
+        response.data = users;
+        return new ResponseEntity<APIResponseDTO>(response, HttpStatus.OK);
     }
 
-    private void validateToken(String authorization) {
-        logger.info("TOKEN: " +authorization);
 
-        if(authorization.equals(AppConst.TOKEN)){
-
-        }else{
-            throw new UserException("Authorization", "Invalid token");
-        }
-    }
 
     @GetMapping("{id}")
-    public ResponseEntity<User> getUser(@RequestHeader String authorization, @PathVariable String id) {
+    public ResponseEntity<APIResponseDTO> getUser(@RequestHeader String authorization, @PathVariable String id) {
         validateToken(authorization);
-        return new ResponseEntity<User>(userService.getUserById(id),HttpStatus.OK);
+
+        APIResponseDTO response =userService.makeAPIResponse();
+        response.code=HttpStatus.OK.value();
+        response.path="api/users/"+id;
+        List<User> users =new ArrayList<User>();
+        users.add(userService.getUserById(id));
+        response.data = users;
+        return new ResponseEntity<APIResponseDTO>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
@@ -70,26 +70,38 @@ public class UserController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<User> updateUserDetails(@RequestHeader String authorization, @Valid @RequestBody User user, @PathVariable String id ) {
+    public ResponseEntity<APIResponseDTO> updateUserDetails(@RequestHeader String authorization, @Valid @RequestBody User user, @PathVariable String id ) {
         validateToken(authorization);
 
-        User res =userService.updateUserDetail(user, id);
-       logger.info("RETURNED USER:"+ res);
-        return new ResponseEntity<User>(res, HttpStatus.OK);
+        APIResponseDTO response =userService.makeAPIResponse();
+        response.code=HttpStatus.OK.value();
+        response.path="api/users/"+id;
+        List<User> users =new ArrayList<User>();
+        users.add(userService.updateUserDetail(user, id));
+        response.data = users;
+
+        return new ResponseEntity<APIResponseDTO>(response, HttpStatus.OK);
 
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestHeader String authorization, @Valid @RequestBody User user) {
+    public ResponseEntity<APIResponseDTO> createUser(@RequestHeader String authorization, @Valid @RequestBody User user) {
         validateToken(authorization);
        boolean dupStatus = isUserDuplicate(user.getEmail());
         logger.info("DUP_STATUS: "+dupStatus);
         logger.info("USER: "+user);
         if(dupStatus){
 
-            throw new ResourceNotFound("User", "Email", "A user has already been registered with this email");
+            throw new EmailDuplicateException("/users", "Email", String.format("Duplicate email %s", user.getEmail()));
         }else{
-            return new ResponseEntity<User>(userService.saveUser(user), HttpStatus.CREATED);
+            APIResponseDTO response =userService.makeAPIResponse();
+            response.code=HttpStatus.CREATED.value();
+            response.path="api/users";
+            List<User> users =new ArrayList<User>();
+            users.add(userService.saveUser(user));
+            response.data = users;
+
+            return new ResponseEntity<APIResponseDTO>(response, HttpStatus.CREATED);
         }
 
 
